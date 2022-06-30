@@ -8,16 +8,17 @@ import 'firebase/compat/auth';
 
 export default function CardMenuCustomer(props) {
 
-    function Order(id, name, picture) {
+    function Order(id, name, picture,price) {
         
         firebase.auth().onAuthStateChanged((user) => {
             if (user != null) {
                 let docRef = firestore.collection('users').doc(user.uid).collection('cart');
-
+                console.log("กำลังเพิ่มสินค้าลงตะกร้า");
                 docRef.add({
                     name: name,
                     prodid: id,
-                    picture: picture
+                    picture: picture,
+                    price: price,
                 });
             }
             alert("เพิ่ม "+ name + " ลงในตะกร้าสินค้า")
@@ -50,7 +51,7 @@ export default function CardMenuCustomer(props) {
                 <Text style={{ color: "white", flex: 9, shadowColor: "gray", fontSize: 16, fontWeight: "bold" }}> {props.name}</Text>
                 <Text style={{ color: "white", flex: 1, fontWeight: "bold" }}>{props.price}.-</Text>
                 <View style={{ alignItems: "center", padding: 9 }}>
-                    <TouchableOpacity onPress={() => Order(props.id, props.name, props.picture)}>
+                    <TouchableOpacity onPress={() => Order(props.id, props.name, props.picture,props.price)}>
                         <AntDesign style={{ flex: 1 }} name="pluscircleo" size={24} color="#66FF00" />
                     </TouchableOpacity>
                 </View>

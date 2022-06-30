@@ -7,6 +7,8 @@ import firestore from '../firestore';
 import 'firebase/compat/auth';
 import { getAuth } from 'firebase/auth';
 
+import * as Speech from 'expo-speech';
+
 import Ionicons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Logo from '../assets/logo1.png';
 // import 'react-native-gesture-handler';
@@ -32,11 +34,19 @@ export default function Login({ navigation }) {
         console.log("กำลังโหลด สถานะ: "+status)
         
         if (status === "store") {
-          alert('ยินดีต้อนรับ Store เข้าสู่ระบบสำเร็จ');
+
+          const thingToSay = `เข้าสู่ระบบสำเร็จ ยินดีต้อนรับสู่ ${status} ค่ะ`
+          alert(thingToSay);
+          Speech.speak(thingToSay)
+
           navigation.reset({ index: 0, routes: [{ name: 'HomeStore' }] });
           console.log("สถานะ: "+status+" ตรวจสอบสำเร็จ")
         } else if (status === "customer") {
-          alert('ยินดีต้อนรับ Customer เข้าสู่ระบบสำเร็จ');
+          
+          const thingToSay = `เข้าสู่ระบบสำเร็จ ยินดีต้อนรับสู่ ${status} ค่ะ`
+          alert(thingToSay);
+          Speech.speak(thingToSay)
+
           navigation.reset({ index: 0, routes: [{ name: 'Home' }] });
           console.log("สถานะ:"+status+" ตรวจสอบสำเร็จ")
         }
@@ -44,7 +54,9 @@ export default function Login({ navigation }) {
       })
       .catch((error) => {
         // alert(error.message);
-        alert("กรุณากรอกรหัสผ่านใหม่");
+        const thingToSay = `Email หรือ Password ไม่ถูกต้องกรุณากรอกข้อมูลใหม่ค่ะ`
+          alert(thingToSay);
+          Speech.speak(thingToSay)
       });
   }
 

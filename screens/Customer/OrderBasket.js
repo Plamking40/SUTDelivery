@@ -9,7 +9,8 @@ import {
     FlatList,
     ScrollView,
     Button,
-    Pressable
+    Pressable,
+    LogBox
 } from 'react-native';
 import Constants from 'expo-constants';
 

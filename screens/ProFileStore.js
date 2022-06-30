@@ -15,9 +15,13 @@ import firestore from '../firestore';
 import 'firebase/compat/auth';
 import 'firebase/compat/storage';
 
+import { FontAwesome } from '@expo/vector-icons';
+
 import * as SecureStore from 'expo-secure-store';
 
 import * as ImagePicker from 'expo-image-picker';
+
+import * as Speech from 'expo-speech';
 
 export default function ProFile({ navigation }) {
     const [cuser, setCuser] = useState('');
@@ -46,7 +50,7 @@ export default function ProFile({ navigation }) {
         }
         CheckLogin();
         LogBox.ignoreAllLogs();
-    }, []);
+    });
 
     useEffect(() => {
         async function AskPer() {
@@ -66,13 +70,13 @@ export default function ProFile({ navigation }) {
 
         if (!result.cancelled) {
             let respose = await fetch(result.uri);
-            let blob = await respose.blob();
-
+            let blob = await respose.blob(); 
             let storageRef = firebase.storage().ref();
             let picRef = storageRef.child(cuser.uid + '.jpg');
-
+            console.log("กำลังอัพโหลด Image กรุณารอสักครู่")
             picRef.put(blob).then((pic) => {
                 alert("Uploaded!")
+                console.log(" Uploaded! สำเร็จ ")
             });
         }
     }
@@ -88,15 +92,16 @@ export default function ProFile({ navigation }) {
         await SecureStore.deleteItemAsync('editpicture');
         navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
         console.log("ออจากระบบ และ เคลียร์ข้อมลทั้งหมด เรียบร้อย")
+        Speech.speak('ออจากระบบเรียบร้อยค่ะ')
     }
     return (
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
 
-            <View style={{ flexDirection: "row", alignItems: 'flex-end', justifyContent: 'center' }}>
+            <View style={{ }}>
                 <Image source={image == '' ? require('../assets/logo1.png') : { uri: image }} resizeMode="cover"
-                    style={{ width: 120, height: 120, borderRadius: 5, }} />
-                <Pressable style={{ padding: 5, backgroundColor: "gray", borderRadius: 10 }} onPress={() => UploadPic()} >
-                    <Text style={{ color: "white" }}>Edit Image</Text>
+                    style={{ width: 120, height: 120, borderRadius: 80,alignItems:'center' }} />
+                <Pressable style={{ padding: 5, backgroundColor: "#49FFDE", borderRadius: 40 ,position:'absolute',marginTop:85,marginLeft:80,borderColor:"white",borderWidth:3}} onPress={() => UploadPic()} >
+                <FontAwesome style={{marginLeft:2}} name="edit" size={18} color="black" onPress={() => UploadPic()} />
                     </Pressable>
             </View>
 

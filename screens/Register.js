@@ -16,6 +16,7 @@ import firestore from '../firestore';
 import 'firebase/compat/auth';
 import Ionicons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Picker } from '@react-native-picker/picker';
+import * as Speech from 'expo-speech';
 
 
 export default function Register({ navigation }) {
@@ -23,30 +24,37 @@ export default function Register({ navigation }) {
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
 
-  const [selectedstatus, setSelectedstatus] = useState();
+  const [selectedstatus, setSelectedstatus] = useState('customer');
 
 
   async function UserLogin() {
-    await firebase
-      .auth()
+
+    if (email != '' && password != '' && name != '') {
+      firebase
+        .auth()
       .createUserWithEmailAndPassword(email, password)
-      .then((user) => {
+      .then(async (user) => {
         let collRef = firestore.collection('users').doc(user.user.uid);
         console.log("กำลังบันทึกข้อมูล")
-        console.log("user" + user)
-        console.log("collRef" + collRef)
-        collRef.set({
+        await collRef.set({
           email: email,
           name: name,
           status: selectedstatus
         });
         console.log("บันทึกข้อมูลเสร็จสิ้น")
-        
         navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
+        const thingToSay = `สมัครสมาชิก ${selectedstatus} สำเร็จ ค่ะ`
+        alert(thingToSay);
+        Speech.speak(thingToSay)
       })
       .catch((error) => {
         alert(error.message);
       });
+    } else {
+      const thingToSay = `กรุณากรอกข้อมูลให้ครบ ค่ะ`
+          alert(thingToSay);
+          Speech.speak(thingToSay)
+    }
   }
 
   return (

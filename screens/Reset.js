@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Text, View, StyleSheet, TextInput, Button,SafeAreaView, Pressable} from 'react-native';
 import Constants from 'expo-constants';
-import firebase from '../firestore';
+
+import firebase from 'firebase/compat/app';
+import firestore from '../firestore';
 import 'firebase/compat/auth';
+
 import Ionicons from 'react-native-vector-icons/MaterialCommunityIcons';
-// import 'react-native-gesture-handler';
 
 
 export default function App({navigation}) {
@@ -16,6 +18,7 @@ export default function App({navigation}) {
       .sendPasswordResetEmail(email)
       .then(() => {
         alert('ส่งอีเมล์เรียบร้อยแล้ว');
+        navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
       })
       .catch((error) => {
         alert(error.message);

@@ -3,14 +3,13 @@ import {
     View,
     Text,
     SafeAreaView,
-    StyleSheet,
     TouchableOpacity,
     Image,
-    FlatList,
     ScrollView,
+    Pressable,
     Button,
     Modal,
-    Pressable
+    LogBox
 } from 'react-native';
 import Constants from 'expo-constants';
 import { getAuth } from 'firebase/auth';
@@ -28,6 +27,9 @@ export default function ListStatus({ navigation }) {
     const [image, setImage] = useState('');
     const [fname, setFname] = useState('');
     const [cart, setCart] = useState([]);
+    const [modalVisible, setModalVisible] = useState(false); //Set Pop-up
+
+
 
     const user = getAuth().currentUser;
 
@@ -36,18 +38,19 @@ export default function ListStatus({ navigation }) {
     }
 
     async function GetCart(id) {
-        console.log(id);
-        let collRef = firestore.collection('orders').doc(id);
-        collRef.collection('products').get().then((doc) => {
+        let collRef = firestore.collection('orders').doc(id).collection('products');
+        collRef.onSnapshot((querySnap) => {
+            const dataquery = [];
 
-            setCart(doc.data().name);
-            console.log(cart);
+            querySnap.forEach(documentSnapshot => {
+                dataquery.push({
+                    ...documentSnapshot.data(),
+                    key: documentSnapshot.id,
+                });
+            });
+            setCart(dataquery);
         });
-
-        // await collRef.collection('products').doc(id).get().then(async (doc) => {
-        //     setCart(doc.data());
-        // });
-
+        console.log(cart);
     }
 
     async function GetProducts() {
@@ -67,10 +70,11 @@ export default function ListStatus({ navigation }) {
         });
     }
     useEffect(() => {
-        CheckLogin()
-        GetProducts()
-        // return () => {setProducts([]); setImage([]);};
-    },[])
+        if (CheckLogin()) {
+            GetProducts()
+        }
+        LogBox.ignoreAllLogs();
+    })
 
     async function CheckLogin() {
         firebase.auth().onAuthStateChanged(async (user) => {
@@ -118,7 +122,6 @@ export default function ListStatus({ navigation }) {
         )
     }
 
-    const [modalVisible, setModalVisible] = useState(false); //Set Pop-up
 
     return (
         <SafeAreaView style={{ paddingTop: Constants.statusBarHeight, flex: 1 }}>
@@ -143,8 +146,8 @@ export default function ListStatus({ navigation }) {
                         flexDirection: "row"
                     }}
                         key={item.key} onPress={() => {
-                             setModalVisible(!modalVisible);
-                            // GetCart(item.key);
+                            GetCart(item.key)
+                            setModalVisible(true)
                         }
                         } >
                         <Text style={{ flex: 3 }}>{new Date(item.createdAt.seconds * 1000).toLocaleString("th-TH", { timeZone: "Asia/Bangkok" })}</Text>
@@ -152,62 +155,65 @@ export default function ListStatus({ navigation }) {
                     </Pressable>
 
                 ))}
-
+                
                 <Modal transparent={true} visible={modalVisible} >
-                    <View
-                        style={{
-                            backgroundColor: 'white',
-                            margin: 50,
-                            borderRadius: 10,
-                            shadowOffset: {
-                                width: 0,
-                                height: 2,
-                            },
-                            shadowOpacity: 0.25,
-                            shadowRadius: 4,
-                            elevation: 5,
-                        }}>
-                        <View
-                            style={{
-                                backgroundColor: '#49FFDE',
-                                padding: 20,
-                                borderTopRightRadius: 10,
-                                borderTopLeftRadius: 10,
-                                alignItems: 'center',
-                            }}>
-                            <Text style={{ fontSize: 24 }}>AF-229</Text>
-                        </View>
-                        <View
-                            style={{
-                                backgroundColor: '#2222',
-                                paddingLeft: 20,
-                                paddingRight: 20,
-                                flexDirection: 'row',
-                            }}>
-                            <Text style={{ fontSize: 16, flex: 4 }}>Bison Burgers</Text>
-                            <Text style={{ fontSize: 16, flex: 1 }}>2</Text>
-                            <Text style={{ fontSize: 16, flex: 1 }}>39</Text>
-                            <Text style={{ fontSize: 16, flex: 1 }}>78</Text>
-                        </View>
-                        <View
-                            style={{
-                                backgroundColor: '#2222',
-                                paddingLeft: 20,
-                                paddingRight: 20,
-                                flexDirection: 'row',
-                            }}>
-                            <Text style={{ fontSize: 16, flex: 5 }}>รวม</Text>
-                            <Text style={{ fontSize: 16, flex: 1 }}>300</Text>
-                            <Text style={{ fontSize: 16, flex: 1 }}>บาท</Text>
-                        </View>
-                        <View style={{ justifyContent: "center", alignItems: "center" }}>
-                            <Button title="ออก" onPress={() => setModalVisible(!modalVisible)} />
-                        </View>
-                    </View>
-                </Modal>
+                   
+                   <View
+                       style={{
+                           backgroundColor: 'white',
+                           margin: 50,
+                           borderRadius: 10,
+                           shadowOffset: {
+                               width: 0,
+                               height: 2,
+                           },
+                           shadowOpacity: 0.25,
+                           shadowRadius: 4,
+                           elevation: 5,
+                       }}>
+                       <View
+                           style={{
+                               backgroundColor: '#49FFDE',
+                               padding: 20,
+                               borderTopRightRadius: 10,
+                               borderTopLeftRadius: 10,
+                               alignItems: 'center',
+                           }}>
+                           <Text style={{ fontSize: 24 }}>ID</Text>
+                       </View>
+                       <View
+                           style={{
+                               backgroundColor: '#2222',
+                               paddingLeft: 20,
+                               paddingRight: 20,
+                               flexDirection: 'row',
+                           }}>
+                           <Text style={{ fontSize: 16, flex: 4 }}>Bison Burgers</Text>
+                           <Text style={{ fontSize: 16, flex: 1 }}>2</Text>
+                           <Text style={{ fontSize: 16, flex: 1 }}>39</Text>
+                           <Text style={{ fontSize: 16, flex: 1 }}>78</Text>
+                       </View>
+                       <View
+                           style={{
+                               backgroundColor: '#2222',
+                               paddingLeft: 20,
+                               paddingRight: 20,
+                               flexDirection: 'row',
+                           }}>
+                           <Text style={{ fontSize: 16, flex: 5 }}>รวม</Text>
+                           <Text style={{ fontSize: 16, flex: 1 }}>300</Text>
+                           <Text style={{ fontSize: 16, flex: 1 }}>บาท</Text>
+                       </View>
+                       <View style={{ justifyContent: "center", alignItems: "center" }}>
+                           <Button title="ออก" onPress={() => setModalVisible(false)} />
+                       </View>
+                   </View>
+
+               </Modal>
+
 
             </ScrollView>
 
-        </SafeAreaView>
+        </SafeAreaView >
     );
 };
